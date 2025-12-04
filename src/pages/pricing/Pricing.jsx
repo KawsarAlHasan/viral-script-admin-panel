@@ -8,15 +8,17 @@ import {
   Input,
   InputNumber,
   Checkbox,
+  message,
 } from "antd";
 import { GiConfirmed, GiCancel } from "react-icons/gi";
 import { FiEdit } from "react-icons/fi";
 import { usePricing } from "../../services/pricingService";
 import IsLoading from "../../components/IsLoading";
 import IsError from "../../components/IsError";
+import { API, usePackeges } from "../../api/api";
 
 function Pricing() {
-  const { pricingData, isLoading, isError, error, refetch } = usePricing();
+  const { packageData, isLoading, isError, error, refetch } = usePackeges();
   const [billingCycle, setBillingCycle] = useState("monthly");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState(null);
@@ -48,17 +50,26 @@ function Pricing() {
     form.resetFields();
   };
 
-  const handleSaveChanges = (values) => {
-    console.log("Saving changes:", values);
-    // Here you would typically call an API to save changes
-    setIsEditModalOpen(false);
-    form.resetFields();
+  const handleSaveChanges = async (values) => {
+
+    try {
+      const response = await API.patch(`/api/services/packages/${editingPlan.id}/`, values);
+
+      if (response.status === 200) {
+        message.success("Changes saved successfully!");
+        refetch();
+        setIsEditModalOpen(false);
+        form.resetFields();
+      }
+    } catch (error) {
+      message.error("Failed to save changes. Please try again.");
+    }
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {pricingData.map((plan) => {
+        {packageData.map((plan) => {
           const isPopular = plan.id === 2;
           const discountPercentage =
             billingCycle === "monthly"
@@ -155,8 +166,16 @@ function Pricing() {
                       available={true}
                       text={
                         plan.access_scripts_per_month === -1
-                          ? "Unlimited scripts per month"
-                          : `${plan.access_scripts_per_month} scripts per month`
+                          ? "Unlimited Templates download per month"
+                          : `${plan.access_scripts_per_month} Templates download per month`
+                      }
+                    />
+                    <FeatureItem
+                      available={true}
+                      text={
+                        plan.access_ai_scripts_per_month === -1
+                          ? "Unlimited AI Scripts per month"
+                          : `${plan.access_ai_scripts_per_month} AI Scripts per month`
                       }
                     />
                     <FeatureItem
@@ -252,6 +271,15 @@ function Pricing() {
 
           <Form.Item
             name="access_scripts_per_month"
+            label="Templates download per Month"
+            help="Enter -1 for unlimited"
+            rules={[{ required: true, message: "Please enter value" }]}
+          >
+            <InputNumber min={-1} className="w-full" />
+          </Form.Item>
+
+          <Form.Item
+            name="access_ai_scripts_per_month"
             label="Scripts per Month"
             help="Enter -1 for unlimited"
             rules={[{ required: true, message: "Please enter value" }]}

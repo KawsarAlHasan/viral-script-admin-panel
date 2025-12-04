@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Avatar, Dropdown, Button, Drawer, Badge, Space } from "antd";
+import { Avatar, Dropdown, Button, Drawer, Badge, Space, Skeleton } from "antd";
 import { Link, useNavigate } from "react-router-dom";
-// import logoImage from "../assets/mainLogo.svg";
 import {
   MenuOutlined,
   BellOutlined,
@@ -9,14 +8,15 @@ import {
   SettingOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
+import { signOutAdmin, useAdminProfile } from "../api/api";
 
 const Navbar = ({ showDrawer }) => {
+  const { admin, isLoading, isError, error, refetch } = useAdminProfile();
   const navigate = useNavigate();
-
   const [drawerVisible, setDrawerVisible] = useState(false);
 
   const handleSignOut = () => {
-    // signOutAdmin();
+    signOutAdmin();
     navigate("/login");
   };
 
@@ -26,6 +26,14 @@ const Navbar = ({ showDrawer }) => {
       label: (
         <Link to="/profile" className="flex items-center gap-2 px-1 py-2">
           <UserOutlined /> Profile
+        </Link>
+      ),
+    },
+    {
+      key: "settings",
+      label: (
+        <Link to="/settings" className="flex items-center gap-2 px-1 py-2">
+          <SettingOutlined /> Settings
         </Link>
       ),
     },
@@ -42,10 +50,34 @@ const Navbar = ({ showDrawer }) => {
     },
   ];
 
+  if (isLoading) {
+    return (
+      <header className="w-full bg-[#FFFFFF] shadow-sm fixed top-0 z-50 py-[6px]">
+        <div className="mx-2 lg:ml-[30px] lg:mr-24">
+          <div className="flex items-center justify-between h-16">
+            <Skeleton.Avatar active size="large" shape="circle" />
+          </div>
+        </div>
+      </header>
+    );
+  }
+
+  if (isError) {
+    return (
+      <header className="w-full bg-[#FFFFFF] shadow-sm fixed top-0 z-50 py-[6px]">
+        <div className="mx-2 lg:ml-[30px] lg:mr-24">
+          <div className="flex items-center justify-between h-16">
+            <span className="text-red-500">Error loading profile</span>
+          </div>
+        </div>
+      </header>
+    );
+  }
+
   return (
-    <header className="w-full bg-[#FFFFFF] shadow-sm fixed top-0 z-50 py-[6px] ">
-      <div className=" mx-2 lg:ml-[30px] lg:mr-24 ">
-        <div className="flex items-center justify-between h-16 ">
+    <header className="w-full bg-[#FFFFFF] shadow-sm fixed top-0 z-50 py-[6px]">
+      <div className="mx-2 lg:ml-[30px] lg:mr-24">
+        <div className="flex items-center justify-between h-16">
           {/* Left section */}
           <div className="flex items-center">
             <Button
@@ -55,10 +87,7 @@ const Navbar = ({ showDrawer }) => {
               onClick={showDrawer}
             />
 
-            <button
-              // onClick={hinddleOnClick}
-              className="flex items-center space-x-1 lg:space-x-2 xl:space-x-3 logo-container cursor-pointer lg:mr-4"
-            >
+            <button className="flex items-center space-x-1 lg:space-x-2 xl:space-x-3 logo-container cursor-pointer lg:mr-4">
               <div className="relative hidden lg:block">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300">
                   <svg
@@ -81,39 +110,34 @@ const Navbar = ({ showDrawer }) => {
                 </h2>
               </div>
             </button>
-
-            {/* <Link 
-              to="/" 
-              className="text-3xl font-bold  text-purple-500 whitespace-nowrap"
-            >
-                ViralScriptLibrary
-            </Link> */}
           </div>
 
           {/* Right section */}
           <div className="flex items-center gap-4 lg:gap-8">
-            <Badge
-              count={10}
-              size="small"
-              className="cursor-pointer p-2 rounded-full bg-gray-300 hover:text-blue-500 transition-colors"
-            >
-              <BellOutlined
-                className="text-2xl"
-                onClick={() => setDrawerVisible(true)}
-              />
-            </Badge>
-
             <Dropdown
               menu={{ items: profileMenuItems }}
               trigger={["click"]}
               placement="bottomRight"
               overlayClassName="w-48"
             >
-              <Avatar
-                icon={<UserOutlined className="" />}
-                size="large"
-                className="cursor-pointer border border-gray-300 hover:opacity-80 transition-opacity"
-              />
+              <Space className="cursor-pointer hover:opacity-80 transition-opacity">
+                {admin?.profile_image ? (
+                  <Avatar
+                    src={<img src={admin.profile_image} alt="profile" />}
+                    size="large"
+                    className="border border-gray-300"
+                  />
+                ) : (
+                  <Avatar
+                    icon={<UserOutlined />}
+                    size="large"
+                    className="border border-gray-300"
+                  />
+                )}
+                <span className="hidden md:inline-block font-medium">
+                  {admin?.full_name || "Admin"}
+                </span>
+              </Space>
             </Dropdown>
           </div>
         </div>

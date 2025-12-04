@@ -1,29 +1,59 @@
 import React, { useRef, useState } from "react";
-import { Avatar, Tabs } from "antd";
+import { Avatar, message, Tabs } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import { MdLockReset } from "react-icons/md";
 import { FaUserEdit } from "react-icons/fa";
 import { FiCamera } from "react-icons/fi";
 import EditProfile from "./EditProfile";
 import ChangePassword from "./ChangePassword";
+import { API, useAdminProfile } from "../../api/api";
+import IsLoading from "../../components/IsLoading";
+import IsError from "../../components/IsError";
 
 const { TabPane } = Tabs;
 
 function Profile() {
+  const { admin, isLoading, isError, error, refetch } = useAdminProfile();
   const fileInputRef = useRef(null);
   const [avatarUrl, setAvatarUrl] = useState(
-    "https://images.news18.com/ibnlive/uploads/2021/08/shah-rukh-khan-01-16300515664x3.jpg"
+    admin?.profile_image ||
+      "https://images.news18.com/ibnlive/uploads/2021/08/shah-rukh-khan-01-16300515664x3.jpg"
   );
+
+  if (isLoading) {
+    return <IsLoading />;
+  }
+  if (isError) {
+    return <IsError error={error} refetch={refetch} />;
+  }
 
   const handleAvatarClick = () => {
     fileInputRef.current.click();
   };
 
-  const handleFileChange = (event) => {
+  const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
       const url = URL.createObjectURL(file);
       setAvatarUrl(url);
+    }
+
+    try {
+      const formData = new FormData();
+
+      const profileImage = event.target.files[0];
+      if (profileImage) {
+        formData.append("profile_image", file);
+      }
+
+      const res = await API.put("/api/auth/profile/", formData);
+
+      if (res.status === 200) {
+        message.success("Profile picture updated successfully!");
+        refetch();
+      }
+    } catch (error) {
+      message.error("Failed to update profile. Please try again.");
     }
   };
 
@@ -54,8 +84,8 @@ function Profile() {
           />
         </div>
 
-        <h2 className="text-[30px] font-semibold  mt-4">
-          Shah Rukh Khan
+        <h2 className="text-[30px] font-semibold mt-4">
+          {admin?.full_name || "Admin User"}
         </h2>
 
         {/* Tabs */}
@@ -69,7 +99,7 @@ function Profile() {
             }
             key="1"
           >
-            <EditProfile />
+            <EditProfile admin={admin} refetch={refetch} />
           </TabPane>
 
           <TabPane
@@ -86,7 +116,6 @@ function Profile() {
         </Tabs>
       </div>
 
-      
       <style jsx global>{`
         .custom-tabs .ant-tabs-tab {
           font-size: 16px;

@@ -8,6 +8,9 @@ import UsersPage from "../pages/users/Users";
 import Pricing from "../pages/pricing/Pricing";
 import TermsConditions from "../pages/termsConditions/TermsConditions";
 import PrivacyPolicy from "../pages/privacyPolicy/PrivacyPolicy";
+import PrivateRoute from "./PrivateRoute";
+import Templates from "../pages/templates/Templates";
+import ResearchSheets from "../pages/research-sheets/ResearchSheets";
 
 export const router = createBrowserRouter([
   {
@@ -32,7 +35,11 @@ export const router = createBrowserRouter([
   //   },
   {
     path: "/",
-    element: <MainLayout />,
+    element: (
+      <PrivateRoute>
+        <MainLayout />
+      </PrivateRoute>
+    ),
     children: [
       {
         path: "/",
@@ -45,6 +52,14 @@ export const router = createBrowserRouter([
       {
         path: "/pricing",
         element: <Pricing />,
+      },
+      {
+        path: "/templates",
+        element: <Templates />,
+      },
+      {
+        path: "/research-sheets",
+        element: <ResearchSheets />,
       },
       {
         path: "/profile",

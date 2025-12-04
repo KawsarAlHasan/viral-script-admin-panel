@@ -5,14 +5,18 @@ import { GiConfirmed } from "react-icons/gi";
 import { Link } from "react-router-dom";
 import XPTrendsChart from "../../components/XPTrendsChart";
 import UserChart from "../../components/UserChart";
+import { useAdminProfile } from "../../api/api";
 
 function Dashboard() {
+  const {admin} = useAdminProfile()
   const demoData = {
     total_user: "12,530",
     daily_xp: "3,530",
     completed_tasks: "12,530",
     revenue: "3,530",
   };
+
+  console.log(admin);
 
   return (
     <div>

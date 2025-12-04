@@ -7,6 +7,7 @@ import {
 } from "@ant-design/icons";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaUsers } from "react-icons/fa";
+import { TbTemplate } from "react-icons/tb";
 import { MdOutlinePayment, MdLeaderboard } from "react-icons/md";
 import { FaBuildingFlag } from "react-icons/fa6";
 import { SlBadge } from "react-icons/sl";
@@ -31,6 +32,8 @@ const Sidebar = ({ onClick }) => {
     if (path === "/") return ["dashboard"];
     if (path === "/user-management") return ["users"];
     if (path === "/pricing") return ["pricing"];
+    if (path === "/templates") return ["templates"];
+    if (path === "/research-sheets") return ["research-sheets"];
     if (path === "/profile") return ["settings", "setting-profile"];
     if (path === "/terms-conditions") return ["settings", "terms-conditions"];
     if (path === "/privacy-policy") return ["settings", "privacy-policy"];
@@ -43,17 +46,27 @@ const Sidebar = ({ onClick }) => {
       icon: <AppstoreOutlined />,
       label: <Link to="/">Dashboard</Link>,
     },
-    {
-      key: "users",
-      icon: <FaUsers />,
-      label: <Link to="/user-management">User Management</Link>,
-    },
+    // {
+    //   key: "users",
+    //   icon: <FaUsers />,
+    //   label: <Link to="/user-management">User Management</Link>,
+    // },
     {
       key: "pricing",
       icon: <TbPackages />,
       label: <Link to="/pricing">Pricing</Link>,
     },
-     {
+    {
+      key: "templates",
+      icon: <TbTemplate />,
+      label: <Link to="/templates">Templates</Link>,
+    },
+    {
+      key: "research-sheets",
+      icon: <TbTemplate />,
+      label: <Link to="/research-sheets">Research Sheets</Link>,
+    },
+    {
       key: "settings",
       icon: <SettingOutlined />,
       label: "Settings",
@@ -64,17 +77,17 @@ const Sidebar = ({ onClick }) => {
           key: "setting-profile",
           label: <Link to="/profile">Profile</Link>,
         },
-        {
-          key: "terms-conditions",
-          label: <Link to="/terms-conditions">Terms & Conditions</Link>,
-        },
-        {
-          key: "privacy-policy",
-          label: <Link to="/privacy-policy">Privacy Policy</Link>,
-        },
+        // {
+        //   key: "terms-conditions",
+        //   label: <Link to="/terms-conditions">Terms & Conditions</Link>,
+        // },
+        // {
+        //   key: "privacy-policy",
+        //   label: <Link to="/privacy-policy">Privacy Policy</Link>,
+        // },
       ],
     },
- 
+
     // Add logout as a menu item at the bottom
     {
       key: "logout",
